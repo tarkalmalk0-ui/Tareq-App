@@ -1,0 +1,11 @@
+{
+  "name": "طارق - إدارة الفواتير",
+  "short_name": "طارق",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#14243a",
+  "description": "تطبيق إنشاء وإدارة الفواتير بالدولار الأمريكي"
+}

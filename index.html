@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14243a">
+<meta name="description" content="طارق - تطبيق بسيط لإنشاء وإدارة الفواتير بالدولار">
+<link rel="manifest" href="manifest.webmanifest">
+<title>طارق | الفواتير</title>
+<style>
+:root{--navy:#14243a;--blue:#2864dc;--bg:#f3f6fb;--ink:#182338;--muted:#6c7890;--line:#e4e9f1;--white:#fff;--green:#16865b;--red:#c43d4b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+header{background:linear-gradient(135deg,#14243a,#234a76);color:white;padding:22px 18px 28px;border-radius:0 0 24px 24px}
+.head{max-width:980px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:#ffffff20;display:grid;place-items:center;font-size:25px;font-weight:800;border:1px solid #ffffff35}
+h1{font-size:23px;margin:0}.sub{font-size:12px;color:#d8e4f5;margin-top:3px}
+main{max-width:980px;margin:-12px auto 40px;padding:0 14px}
+.tabs{display:flex;gap:8px;margin-bottom:14px;overflow:auto}.tab{border:0;background:white;color:var(--muted);padding:11px 16px;border-radius:12px;font-weight:700;white-space:nowrap}.tab.active{background:var(--blue);color:white}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 20px #1b35500a}
+h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+input,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fbfcfe;color:var(--ink);font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--blue)}.full{grid-column:1/-1}
+.items-head,.item{display:grid;grid-template-columns:minmax(0,1fr) 85px 110px 40px;gap:8px;align-items:center}
+.items-head{font-size:11px;color:var(--muted);padding:0 4px 8px}.item{margin-bottom:8px}.item input{padding:10px 8px;min-width:0}
+.iconbtn{border:0;border-radius:10px;background:#fff0f0;color:var(--red);height:39px;font-size:18px}
+.add{border:1px dashed #9db4d9;background:#f7faff;color:var(--blue);padding:11px;border-radius:11px;width:100%;font-weight:700;margin-top:4px}
+.summary{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line);margin-top:14px}.total{font-size:25px;font-weight:800;color:var(--navy)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:11px;padding:12px 17px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#edf2fa;color:#29415f}.danger{background:#fff0f0;color:var(--red)}
+.muted{color:var(--muted);font-size:12px}.invoice{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px}.invoice strong{display:block}.invoice small{color:var(--muted)}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.hidden{display:none!important}
+footer{text-align:center;color:#8792a4;font-size:11px;padding:10px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.items-head,.item{grid-template-columns:minmax(0,1fr) 58px 82px 34px;gap:5px}.item input{font-size:13px;padding:9px 5px}.panel{padding:14px}.total{font-size:22px}}
+@media print{
+ body{background:white}.no-print,header,.tabs,footer{display:none!important}main{margin:0;padding:0;max-width:none}.panel{box-shadow:none;border:0;padding:0;margin:0}.print-title{display:block!important}
+ input{border:0!important;background:white!important;padding:4px 0!important;color:#111!important}.items-head,.item{grid-template-columns:minmax(0,1fr) 70px 100px 0}.item .iconbtn{display:none}.summary{border-top:2px solid #333}.total{color:#111}
+}
+</style>
+</head>
+<body>
+<header class="no-print"><div class="head"><div class="brand"><div class="logo">ط</div><div><h1>طارق</h1><div class="sub">إدارة الفواتير والمبيعات بالدولار</div></div></div><div style="font-size:12px;color:#d8e4f5">TAREQ APP</div></div></header>
+<main>
+<div class="tabs no-print"><button class="tab active" data-tab="new">فاتورة جديدة</button><button class="tab" data-tab="saved">الفواتير المحفوظة</button></div>
+<section id="newView">
+<div class="panel no-print" id="monthlyPanel">
+  <h2>ملخص مبيعات الشهر</h2>
+  <div class="grid">
+    <div><div class="muted">إجمالي المبيعات هذا الشهر</div><div class="total" id="monthTotal">$0.00</div></div>
+    <div><div class="muted">عدد الفواتير هذا الشهر</div><div class="total" id="monthCount">0</div></div>
+  </div>
+  <div class="muted" id="monthLabel"></div>
+</div>
+<div class="panel">
+<div class="print-title hidden"><h2>طارق | فاتورة مبيعات</h2></div>
+<h2>معلومات الفاتورة</h2>
+<div class="grid">
+<div class="field"><label>رقم الفاتورة</label><input id="invoiceNo" placeholder="يُنشأ تلقائياً"></div>
+<div class="field"><label>التاريخ</label><input id="date" type="date"></div>
+<div class="field"><label>اسم الزبون</label><input id="customer" placeholder="اسم الزبون"></div>
+<div class="field"><label>رقم الهاتف</label><input id="phone" type="tel" placeholder="رقم الهاتف"></div>
+<div class="field full"><label>العنوان / ملاحظات</label><textarea id="notes" rows="2" placeholder="العنوان أو أي ملاحظات إضافية"></textarea></div>
+</div>
+</div>
+<div class="panel">
+<h2>المواد</h2>
+<div class="items-head"><span>اسم المادة</span><span>الكمية</span><span>السعر ($)</span><span></span></div>
+<div id="items"></div>
+<button class="add no-print" id="addItem">＋ إضافة مادة</button>
+<div class="summary"><div><strong>الإجمالي</strong><div class="muted">المبلغ بالدولار الأمريكي</div></div><div class="total" id="total">$0.00</div></div>
+<div class="actions no-print">
+<button class="btn primary" id="save">حفظ الفاتورة</button>
+<button class="btn secondary" id="print">طباعة / PDF</button>
+<button class="btn secondary" id="clear">فاتورة جديدة</button>
+</div>
+</div>
+</section>
+<section id="savedView" class="hidden">
+<div class="panel"><h2>الفواتير المحفوظة</h2><div class="field"><label>بحث باسم الزبون أو رقم الفاتورة</label><input id="search" placeholder="اكتب للبحث..."></div><div id="invoiceList"></div></div>
+</section>
+<footer>طارق TAREQ · تُحفظ البيانات على هذا الجهاز</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let rows=[];
+let editingId=null;
+const today=()=>new Date().toISOString().slice(0,10);
+function newNo(){return 'TR-'+Date.now().toString().slice(-8)}
+function addRow(name='',qty=1,price=''){
+ const id=crypto.randomUUID?crypto.randomUUID():String(Math.random());
+ rows.push({id,name,qty,price}); renderRows();
+}
+function renderRows(){
+ $('items').innerHTML='';
+ rows.forEach(r=>{
+  const el=document.createElement('div');el.className='item';
+  el.innerHTML='<input aria-label="اسم المادة" placeholder="اسم المادة" data-k="name"><input aria-label="الكمية" type="number" min="0" step="any" data-k="qty"><input aria-label="السعر" type="number" min="0" step="any" data-k="price"><button class="iconbtn no-print" title="حذف">×</button>';
+  const [n,q,p]=el.querySelectorAll('input');n.value=r.name;q.value=r.qty;p.value=r.price;
+  [n,q,p].forEach(inp=>inp.addEventListener('input',()=>{r[inp.dataset.k]=inp.dataset.k==='name'?inp.value:Number(inp.value);calc()}));
+  el.querySelector('button').onclick=()=>{rows=rows.filter(x=>x.id!==r.id);renderRows()};
+  $('items').appendChild(el);
+ });calc();
+}
+function calc(){let sum=rows.reduce((s,r)=>s+(Number(r.qty)||0)*(Number(r.price)||0),0);$('total').textContent='$'+sum.toFixed(2);return sum}
+function reset(){
+ editingId=null;$('invoiceNo').value=newNo();$('date').value=today();$('customer').value='';$('phone').value='';$('notes').value='';rows=[];addRow();addRow();
+}
+function getInvoices(){try{return JSON.parse(localStorage.getItem('tareq_invoices')||'[]')}catch{return []}}
+function setInvoices(a){localStorage.setItem('tareq_invoices',JSON.stringify(a));renderMonthly()}
+function renderMonthly(){
+ const now=new Date();
+ const ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+ const monthInvoices=getInvoices().filter(x=>(x.date||'').slice(0,7)===ym);
+ const total=monthInvoices.reduce((s,x)=>s+(Number(x.total)||0),0);
+ $('monthTotal').textContent='$'+total.toFixed(2);
+ $('monthCount').textContent=String(monthInvoices.length);
+ $('monthLabel').textContent='الفترة: '+new Intl.DateTimeFormat('ar-IQ',{month:'long',year:'numeric'}).format(now)+' · تُحسب الفواتير حسب تاريخ الفاتورة';
+}
+function save(){
+ const customer=$('customer').value.trim();
+ if(!customer){alert('يرجى إدخال اسم الزبون');$('customer').focus();return}
+ const valid=rows.filter(r=>r.name.trim()&&(Number(r.qty)||0)>0);
+ if(!valid.length){alert('أضف مادة واحدة على الأقل مع الكمية والسعر');return}
+ const inv={id:editingId||String(Date.now()),no:$('invoiceNo').value||newNo(),date:$('date').value||today(),customer,phone:$('phone').value,notes:$('notes').value,items:valid,total:valid.reduce((s,r)=>s+(Number(r.qty)||0)*(Number(r.price)||0),0)};
+ const all=getInvoices();const i=all.findIndex(x=>x.id===inv.id);if(i>=0)all[i]=inv;else all.unshift(inv);setInvoices(all);
+ alert('تم حفظ الفاتورة على هذا الجهاز');renderList();reset();
+}
+function renderList(){
+ const term=($('search').value||'').toLowerCase();const list=getInvoices().filter(x=>(x.customer+' '+x.no).toLowerCase().includes(term));
+ $('invoiceList').innerHTML='';
+ if(!list.length){$('invoiceList').innerHTML='<div class="empty">لا توجد فواتير محفوظة</div>';return}
+ list.forEach(inv=>{
+  const el=document.createElement('div');el.className='invoice';
+  const info=document.createElement('div');info.innerHTML='<strong></strong><small></small>';info.querySelector('strong').textContent=inv.customer+' · '+inv.no;info.querySelector('small').textContent=inv.date+' · $'+Number(inv.total).toFixed(2);
+  const controls=document.createElement('div');controls.className='actions no-print';
+  const open=document.createElement('button');open.className='btn secondary';open.textContent='فتح';open.onclick=()=>loadInvoice(inv.id);
+  const del=document.createElement('button');del.className='btn danger';del.textContent='حذف';del.onclick=()=>{if(confirm('حذف هذه الفاتورة؟')){setInvoices(getInvoices().filter(x=>x.id!==inv.id));renderList()}};
+  controls.append(open,del);el.append(info,controls);$('invoiceList').append(el);
+ });
+}
+function loadInvoice(id){
+ const inv=getInvoices().find(x=>x.id===id);if(!inv)return;
+ editingId=inv.id;$('invoiceNo').value=inv.no;$('date').value=inv.date;$('customer').value=inv.customer;$('phone').value=inv.phone||'';$('notes').value=inv.notes||'';rows=inv.items.map(x=>({...x,id:crypto.randomUUID?crypto.randomUUID():String(Math.random())}));renderRows();showTab('new');
+}
+function showTab(tab){
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+ $('newView').classList.toggle('hidden',tab!=='new');$('savedView').classList.toggle('hidden',tab!=='saved');
+ if(tab==='saved')renderList();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('addItem').onclick=()=>addRow();$('save').onclick=save;$('print').onclick=()=>{if(window.TareqAndroid&&TareqAndroid.printPage){TareqAndroid.printPage()}else{window.print()}};$('clear').onclick=()=>{if(confirm('بدء فاتورة جديدة؟'))reset()};
+$('search').addEventListener('input',renderList);
+reset();renderMonthly();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
